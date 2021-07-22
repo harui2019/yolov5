@@ -1,0 +1,5 @@
+train: ./train/images
+val: ./valid/images
+
+nc: 10
+names: ['10_blue_train', '11_red_train', '12_normal_vat', '13_airport', '14_quota_receipt', '15_machine-taxi', '16_machine', '17_taxi', '18_bus', '19_toll_fee']

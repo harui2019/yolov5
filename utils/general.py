@@ -181,11 +181,11 @@ def check_requirements(requirements='requirements.txt', exclude=()):
         print(emojis(s))  # emoji-safe
 
 
-def check_img_size(img_size, s=32):
+def check_img_size(img_size, s=32, floor=0):
     # Verify img_size is a multiple of stride s
-    new_size = make_divisible(img_size, int(s))  # ceil gs-multiple
+    new_size = max(make_divisible(img_size, int(s)), floor)  # ceil gs-multiple
     if new_size != img_size:
-        print('WARNING: --img-size %g must be multiple of max stride %g, updating to %g' % (img_size, s, new_size))
+        print(f'WARNING: --img-size {img_size} must be multiple of max stride {s}, updating to {new_size}')
     return new_size
 
 
@@ -231,6 +231,9 @@ def check_dataset(data, autodownload=True):
             if data.get(k):  # prepend path
                 data[k] = str(path / data[k]) if isinstance(data[k], str) else [str(path / x) for x in data[k]]
 
+    assert 'nc' in data, "Dataset 'nc' key missing."
+    if 'names' not in data:
+        data['names'] = [str(i) for i in range(data['nc'])]  # assign class names if missing
     train, val, test, s = [data.get(x) for x in ('train', 'val', 'test', 'download')]
     if val:
         val = [Path(x).resolve() for x in (val if isinstance(val, list) else [val])]  # val path

@@ -22,7 +22,7 @@ from utils.datasets import LoadStreams, LoadImages
 from utils.general import check_img_size, check_requirements, check_imshow, colorstr, non_max_suppression, \
     apply_classifier, scale_coords, xyxy2xywh, strip_optimizer, set_logging, increment_path, save_one_box
 from utils.plots import colors, plot_one_box
-from utils.torch_utils import select_device, load_classifier, time_synchronized
+from utils.torch_utils import select_device, load_classifier, time_sync
 
 
 @torch.no_grad()
@@ -107,7 +107,7 @@ def run(
             img = img.unsqueeze(0)
 
         # Inference
-        t1 = time_synchronized()
+        t1 = time_sync()
         pred = model(
             img,
             augment=augment,
@@ -115,7 +115,7 @@ def run(
 
         # Apply NMS
         pred = non_max_suppression(pred, conf_thres, iou_thres, classes, agnostic_nms, max_det=max_det)
-        t2 = time_synchronized()
+        t2 = time_sync()
 
         # Apply Classifier
         if classify:
@@ -148,7 +148,6 @@ def run(
                     "name": "%s" % p.name,
                     "class" : {}
                 }
-                jj+=1
                 iii = 0
                 for *xyxy, conf, cls in reversed(det):
                     if save_txt:  # Write to file
@@ -159,7 +158,7 @@ def run(
                             f.write(writetxt + '\n')
                             
                     writetxt = writetxt.split()
-                    jdata[i]["class"][iii] = {
+                    jdata[jj]["class"][iii] = {
                         "subclass_str": str(names[int(writetxt[0])]),
                         "subclass_num": writetxt[0],
                         "loc": [ float(cor) for cor in writetxt[1:5] ],
@@ -182,7 +181,7 @@ def run(
                             save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
 
             # Print time (inference + NMS)
-            print(f'{s}Done. ({t2 - t1:.3f}s)')
+            print(f'{s}Done. ({t2 - t1:.3f}s)')          
 
             # Stream results
             if view_img:
@@ -207,6 +206,7 @@ def run(
                             save_path += '.mp4'
                         vid_writer[i] = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
                     vid_writer[i].write(im0)
+        jj+=1
 
     if save_txt or save_img:
         s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ''

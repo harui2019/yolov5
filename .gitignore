@@ -23,7 +23,8 @@
 !cfg/yolov3*.cfg
 
 storage.googleapis.com
-runs/*
+runs/detect/*
+!runs/train/*
 data/*
 !data/hyps/*
 !data/images/zidane.jpg
@@ -36,6 +37,10 @@ results*.txt
 coco/
 coco128/
 VOC/
+
+train/
+test/
+valid/
 
 # MATLAB GitIgnore -----------------------------------------------------------------------------------------------------
 *.m~

@@ -153,25 +153,24 @@ def run(
                     if save_txt:  # Write to file
                         xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
                         line = (cls, *xywh, conf) if save_conf else (cls, *xywh)  # label format
+                        # line is the str with label location
                         writetxt = ('%g ' * len(line)).rstrip() % line
                         with open(txt_path + '.txt', 'a') as f:
                             f.write(writetxt + '\n')
                             
-                    writetxt = writetxt.split()
-                    jdata[jj]["class"][iii] = {
-                        "subclass_str": str(names[int(writetxt[0])]),
-                        "subclass_num": writetxt[0],
-                        "loc": [ float(cor) for cor in writetxt[1:5] ],
-                        "score": float(writetxt[5])
-                    }
-                    iii +=1
+                        writetxt = writetxt.split()
+                        print(writetxt)
+                        jdata[jj]["class"][iii] = {
+                            "subclass_str": str(names[int(writetxt[0])]),
+                            "subclass_num": writetxt[0],
+                            "loc": [ float(cor) for cor in writetxt[1:5] ]
+                        }
+                        if save_conf:
+                            jdata[jj]["class"][iii]["score"] = float(writetxt[5])
                         
-
-                if save_txt: 
-                    with open(txt_path + '.json', 'a') as jfile:
-                        json.dump(jdata[i], jfile, ensure_ascii=False, indent=2)
-
-                            # line is the str with label location
+                        with open(txt_path + '.json', 'a') as jfile:
+                            json.dump(jdata[i], jfile, ensure_ascii=False, indent=2)
+                    iii +=1
 
                     if save_img or save_crop or view_img:  # Add bbox to image
                         c = int(cls)  # integer class
@@ -212,9 +211,15 @@ def run(
         s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ''
         print(f"Results saved to {save_dir}{s}")
 
-        with open(str(save_dir / "allLabel") + '.json', 'a') as jfile:
+#         label_class = [ str(name) for name in names ]
+        with open(str(save_dir / "AllLabel") + '.json', 'a') as jfile:
             json.dump(jdata, jfile, ensure_ascii=False, indent=2)
         print(jdata)
+        
+        with open(str(save_dir / "LabelClass") + '.json', 'a') as jfile:
+            json.dump({
+                'class': names
+            }, jfile, ensure_ascii=False, indent=2)
 
     if update:
         strip_optimizer(weights)  # update model (to fix SourceChangeWarning)

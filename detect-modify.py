@@ -177,8 +177,6 @@ def run(
                         if save_conf:
                             jdata[jj]["class"][iii]["score"] = float(writetxt[5])
                         
-                        with open(txt_path + '.json', 'a') as jfile:
-                            json.dump(jdata[jj], jfile, ensure_ascii=False, indent=2)
                     iii +=1
 
                     if save_img or save_crop or view_img:  # Add bbox to image
@@ -187,6 +185,10 @@ def run(
                         plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=line_thickness)
                         if save_crop:
                             save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
+
+                if save_txt: #write json file
+                    with open(txt_path + '.json', 'a') as jfile:
+                        json.dump(jdata[jj], jfile, ensure_ascii=False, indent=2)
 
             # Print time (inference + NMS)
             print(f'{s}Done. ({t2 - t1:.3f}s)')          

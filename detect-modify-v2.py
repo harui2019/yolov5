@@ -210,7 +210,8 @@ def main(opt):
 
     os.chdir(Project)
     all_vars['name'] = increment_path(Path(str(os.getcwd())) / all_vars['name'], exist_ok= False).name
-    os.chdir('..\\..')
+    os.chdir('..')
+    os.chdir('..')
 
     all_vars['name'] = increment_path(Path(all_vars['name']), exist_ok=Increment)
     OutputFolderName = all_vars['name']

@@ -327,7 +327,7 @@ def main(opt):
         'Do increment since this name has been used.' if Increment else 'Replace existed folder.'
     )))
     print(" - DetectSourceFolder(source) --- \n>>> {}".format(DetectSourceFolder))
-    for f in ['AllLabel.json', 'Labelclass.json']:
+    for f in ['AllLabel.json', 'LabelClass.json']:
         if (ImagesFolder / f).exists():
             print("'{}' has found".format(f))
         else:

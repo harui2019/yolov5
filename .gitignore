@@ -33,10 +33,11 @@ results*.csv
 
 # 2021FarEast ----------------------------------------------------------------------------------------------------------
 
+runs/detect/
+runs/train/
 !runs/train/_invoiceChar/*
 !runs/train/_invoiceDetect/*
-runs/detect/*
-runs/train/*
+
 
 detect-modify-v2_b1.py
 detect-modify.py

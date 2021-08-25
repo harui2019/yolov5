@@ -1,2 +1,0 @@
-      0/99     3.92G       nan       nan       nan       nan        75       416         0         0         0         0       nan       nan       nan
-      1/99     3.55G       nan       nan       nan       nan        82       416         0         0         0         0       nan       nan       nan

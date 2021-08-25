@@ -23,8 +23,6 @@
 !cfg/yolov3*.cfg
 
 storage.googleapis.com
-runs/detect/*
-!runs/train/*
 data/*
 !data/hyps/*
 !data/images/zidane.jpg
@@ -32,6 +30,15 @@ data/*
 !data/*.sh
 
 results*.csv
+
+# 2021FarEast ----------------------------------------------------------------------------------------------------------
+runs/detect/*
+runs/train/*
+!runs/train/_invoiceChar/*
+!runs/train/_invoiceDetect/*
+
+detect-modify-v2_b1.py
+detect-modify.py
 
 # Datasets -------------------------------------------------------------------------------------------------------------
 coco/

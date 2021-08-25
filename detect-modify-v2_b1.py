@@ -1,4 +1,3 @@
-
 import torch
 import os
 import yaml
@@ -175,10 +174,11 @@ def parse_opt():
     parser.add_argument('--hide-labels', default=False, action='store_true', help='hide labels')
     parser.add_argument('--hide-conf', default=False, action='store_true', help='hide confidences')
     parser.add_argument('--half', action='store_true', help='use FP16 half-precision inference')
-
+##    parser.add_argument('--tfl-int8', action='store_true', help='INT8 quantized TFLite model')
+    
     parser.add_argument('--cropname-full', action='store_true', help='use the name with more description')
     parser.add_argument('--yolov5-locate', default=str(
-        str(os.getcwd()) + ('' if Path(os.getcwd()).name=='yolov5' else 'yolov5') 
+        str(os.getcwd()) + ('' if Path(os.getcwd()).name=='yolov5' else 'yolov5')  #0824correct path
     ), help='INT8 quantized TFLite model')
     
     opt = parser.parse_args()

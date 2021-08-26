@@ -34,7 +34,6 @@ results*.csv
 # 2021FarEast ----------------------------------------------------------------------------------------------------------
 
 runs/detect/*
-!runs/detect/
 runs/train/*
 !runs/train/.invoiceRecognize/*
 !runs/train/.invoiceCharacter/*

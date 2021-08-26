@@ -203,15 +203,6 @@ def main(opt):
     UltralyticsYOLOv5Folder = all_vars['yolov5_locate']
     WandbInstall = False
 
-    ## Make Json File
-    Project = all_vars['project']
-    Increment = all_vars['exist_ok']
-
-    os.chdir(Project)
-    all_vars['name'] = increment_path(Path(str(os.getcwd())) / all_vars['name'], exist_ok= False).name
-    os.chdir('..')
-    os.chdir('..')
-
     all_vars['name'] = increment_path(Path(all_vars['name']), exist_ok=Increment)
     OutputFolderName = all_vars['name']
     ImgSize = all_vars['imgsz']
@@ -266,6 +257,14 @@ def main(opt):
     print(" - LabelsFolder ----------------- \n>>> {}".format(names))
 
     ## Make Json File
+    Project = all_vars['project']
+    Increment = all_vars['exist_ok']
+    
+    os.chdir(Project)
+    all_vars['name'] = increment_path(Path(str(os.getcwd())) / all_vars['name'], exist_ok= False).name
+    os.chdir('..')
+    os.chdir('..')
+
     j1 = 0
     null_class_img = []
     for img in glob.iglob(str(ImagesFolder)+'/*'):#0824may have some problem with path

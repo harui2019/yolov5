@@ -36,8 +36,8 @@ results*.csv
 runs/detect/*
 !runs/detect/
 runs/train/*
-!runs/train/.invoiceChar/*
-!runs/train/.invoiceDetect/*
+!runs/train/.invoiceRecognize/*
+!runs/train/.invoiceCharacter/*
 runs/train/*.zip
 
 detect-modify-v2_b1.py

@@ -203,6 +203,10 @@ def main(opt):
     UltralyticsYOLOv5Folder = all_vars['yolov5_locate']
     WandbInstall = False
 
+        ## Make Json File
+    Project = all_vars['project']
+    Increment = all_vars['exist_ok']
+
     all_vars['name'] = increment_path(Path(all_vars['name']), exist_ok=Increment)
     OutputFolderName = all_vars['name']
     ImgSize = all_vars['imgsz']
@@ -257,9 +261,7 @@ def main(opt):
     print(" - LabelsFolder ----------------- \n>>> {}".format(names))
 
     ## Make Json File
-    Project = all_vars['project']
-    Increment = all_vars['exist_ok']
-    
+
     os.chdir(Project)
     all_vars['name'] = increment_path(Path(str(os.getcwd())) / all_vars['name'], exist_ok= False).name
     os.chdir('..')

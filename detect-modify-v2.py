@@ -14,8 +14,8 @@ import argparse
 
 print("\nModules import completed...")
 print(" - Current Directory ------------ \n>>> {}".format(os.getcwd()))
-FILE = Path(os.getcwd()).absolute() if Path(os.getcwd()).name=='yolov5' else str(Path(os.getcwd()).absolute() / 'yolov5')
-print(" - Predict Directory ------------ \n>>> {}".format(FILE))
+FilePath = Path(os.getcwd()).absolute() if Path(os.getcwd()).name=='yolov5' else Path(os.getcwd()).absolute() / Path(__file__).parent
+print(" - Predict Directory ------------ \n>>> {}".format(FilePath))
 
 # Google Colab
 print("-"*30+"\n ### Detect Google Colab Environment...")
@@ -144,6 +144,7 @@ def RawedCatchClass(weights):
     suffix = Path(w).suffix.lower()
     pt, onnx, tflite, pb, graph_def = (suffix == x for x in ['.pt', '.onnx', '.tflite', '.pb', ''])  # backend
     if pt:
+        print(os.getcwd())
         model = attempt_load(weights, map_location=device)  # load FP32 model
         names = model.module.names if hasattr(model, 'module') else model.names  # get class names
         return names
@@ -176,10 +177,9 @@ def parse_opt():
     parser.add_argument('--hide-conf', default=False, action='store_true', help='hide confidences')
     parser.add_argument('--half', action='store_true', help='use FP16 half-precision inference')
 
+    parser.add_argument('--ultralytics-crop', default=False, action='store_true', help='use FP16 half-precision inference')
     parser.add_argument('--cropname-full', action='store_true', help='use the name with more description')
-    parser.add_argument('--yolov5-locate', default=str(
-        str(os.getcwd()) + ('' if Path(os.getcwd()).name=='yolov5' else 'yolov5') 
-    ), help='INT8 quantized TFLite model')
+    parser.add_argument('--yolov5-locate', default=FilePath, help='INT8 quantized TFLite model')
     
     opt = parser.parse_args()
     opt.imgsz *= 2 if len(opt.imgsz) == 1 else 1  # expand
@@ -204,7 +204,7 @@ def main(opt):
     WandbInstall = False
 
         ## Make Json File
-    Project = all_vars['project']
+    Project = Path(all_vars['project'])
     Increment = all_vars['exist_ok']
 
     all_vars['name'] = increment_path(Path(all_vars['name']), exist_ok=Increment)
@@ -213,8 +213,8 @@ def main(opt):
     ConfOverLowExclude = all_vars['conf_thres']
     DetectSourceFolder = Path(all_vars['source'])
     WeightFilePath = Path(all_vars['weights'][0])
-    names = RawedCatchClass(WeightFilePath)
-    ImagesFolder = Path(UltralyticsYOLOv5Folder) / Project / OutputFolderName / ''
+    names = RawedCatchClass(Path(UltralyticsYOLOv5Folder) / WeightFilePath)
+    ImagesFolder = increment_path(Path(UltralyticsYOLOv5Folder) / Project / OutputFolderName / '')
     LabelsFolder = ImagesFolder / 'labels'
 
     save_dir = ''
@@ -225,11 +225,12 @@ def main(opt):
 
     ## Run `'detect.py'`
     run_vars = all_vars.copy()
-    run_vars.pop('cropname_full')
-    run_vars.pop('yolov5_locate')
     run_vars['save_txt'] = True
     run_vars['save_conf'] = True
-    run_vars['save_crop'] = False
+    run_vars['save_crop'] = run_vars['ultralytics_crop']
+    run_vars.pop('cropname_full')
+    run_vars.pop('yolov5_locate')
+    run_vars.pop('ultralytics_crop')
 
     InitUltralytics(UltralyticsYOLOv5Folder)
     #########################
@@ -239,7 +240,7 @@ def main(opt):
     OutputFolderName = save_dir.name
     print(" - Project(project) ------------- {}\n>>> {}".format(os.path.exists(Project), Project))
     print(" - Increment(exists_ok) --------- {}".format(Increment))
-    print(" - OutputFolderName(name) ------- {}\n>>> {}".format(save_dir.name, (
+    print(" - OutputFolderName(name) ------- {}\n>>> {}".format(OutputFolderName, (
         'Do increment since this name has been used.' if Increment else 'Replace existed folder.'
     )))
     print(" - ImgSize(size) ---------------- {}".format(ImgSize))
@@ -247,8 +248,12 @@ def main(opt):
     if os.path.exists(DetectSourceFolder):
         print(" - DetectSourceFolder(source) --- {}\n>>> {}".format(DetectSourceFolder.exists(), DetectSourceFolder))
     else:
-        raise FileNotFoundError("Folder no found, Please Check the directory of the location of original images.")
-    print(" - WeightFilePath(weight) ------- {}\n>>> {}".format(WeightFilePath.exists(), WeightFilePath))
+        raise FileNotFoundError(
+            "Folder no found with this path: '{}'\n".format(DetectSourceFolder) +
+            "Please Check the directory of the location of original images, check argument in '--source'.\n"+
+            " - Current Directory ------------ \n>>> {}".format(os.getcwd())
+        )
+    print(" - WeightFilePath(weight) ------- {}\n>>> {}".format(Path(WeightFilePath).exists(), WeightFilePath))
 
     ## Run `detect.py`
     run(**run_vars)
@@ -258,14 +263,9 @@ def main(opt):
     print("-"*30+"\n ### Write Json File")
     print(" - ImagesFolder ----------------- {}\n>>> {}".format(ImagesFolder.exists(), ImagesFolder))
     print(" - LabelsFolder ----------------- {}\n>>> {}".format(LabelsFolder.exists(), LabelsFolder))
-    print(" - LabelsFolder ----------------- \n>>> {}".format(names))
+    print(" - LabelsClasses ----------------- \n>>> {}".format(names))
 
     ## Make Json File
-
-    os.chdir(Project)
-    all_vars['name'] = increment_path(Path(str(os.getcwd())) / all_vars['name'], exist_ok= False).name
-    os.chdir('..')
-    os.chdir('..')
 
     j1 = 0
     null_class_img = []
@@ -325,7 +325,7 @@ def main(opt):
     ## ReadyCropImg
     print("-"*30+"\n ### Edge Location Get and Cut")
     print(" - Project(project) ------------- {}\n>>> {}".format(os.path.exists(Project), Project))
-    print(" - OutputFolderName(name) ------- {}\n>>> {}".format(save_dir.name, (
+    print(" - OutputFolderName(name) ------- {}\n>>> {}".format(all_vars['name'], (
         'Do increment since this name has been used.' if Increment else 'Replace existed folder.'
     )))
     print(" - DetectSourceFolder(source) --- \n>>> {}".format(DetectSourceFolder))
@@ -368,10 +368,24 @@ def main(opt):
             plt.imshow(afterCrop)
             fileName = cropinfo["file_name_full"] if FullCropName else cropinfo["file_name_serial_num"]
             # fileName = Path(imgName).with_suffix('').name + '.cut.{}.{}'.format(classinfo[0], classinfo[1]) + Path(AllLabel['10']['name']).suffix
-            print(">>> {}\n".format(fileName))
-            print(str(CropFolder / fileName))
+            print(">>> {}\n".format(str(CropFolder / fileName)))
+            # print(str(CropFolder / fileName))
             cv2.imwrite(str(CropFolder / fileName), afterCrop, [cv2.IMWRITE_JPEG_QUALITY, 95])
     print("#"*20)
+    print("# Processing End ...")
+    print("#"*20+"\n")
+
+    #########################
+    ## Export Summary
+    print("-"*30+"\n ### Export Summary")
+    print(" - ExportLocation --------------- \n>>> {}".format((Path(UltralyticsYOLOv5Folder) / save_dir).resolve()))
+    print(" - DetectSourceFolder(source) --- \n>>> {}".format((Path(UltralyticsYOLOv5Folder) / DetectSourceFolder).resolve()))
+    print(" - ImageLabel ------------------- \n>>> {}".format((ImagesFolder / 'labels').resolve()))
+    print(" - AllLabel --------------------- \n>>> {}".format((ImagesFolder / 'AllLabel.json').resolve())) 
+    print(" - LabelClass ------------------- \n>>> {}".format((ImagesFolder / 'LabelClass.json' ).resolve()))  
+    print(" - SourceForCroppedImage -------- \n>>> {}".format((Path(UltralyticsYOLOv5Folder) / Path(imgOriginPath if imgOriginPath.exists() else imgLabelPath).parent).resolve()))
+    print(" - CroppedImage ----------------- \n>>> {}".format(CropFolder.resolve()))
+    print(" - WeightFilePath(weight) ------- \n>>> {}".format((Path(UltralyticsYOLOv5Folder) / WeightFilePath).resolve()))
 
 if __name__ == '__main__':
     opt = parse_opt()

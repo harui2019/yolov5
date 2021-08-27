@@ -1,14 +1,12 @@
-import json
+import json, sys, argparse, os
 
 #取得路徑
-import sys
-##print(len(sys.argv))
-if len(sys.argv) == 2:
-    path = './runs/detect/' + sys.argv[1] + '/'
-    print('-'*15 + 'try to find AllLabel.json in ' + path + '-'*15)
+parser = argparse.ArgumentParser()
+parser.add_argument('--path', nargs=1, type=str, help='file name of the prediction of the receipts recognition')
+path = './runs/detect/' + vars(parser.parse_args())['path'][0] + '/'
 
 #從原本的json生成文字組所需資料格式
-with open(path + 'AllLabel.json','r',encoding='utf8') as allLabel:#讀取原檔
+with open(path + 'AllLabel.json','r',encoding='utf-8') as allLabel:#讀取原檔
     recognize = json.load(allLabel)
 print('-'*15 + 'file loaded' + '-'*15)
 
@@ -17,10 +15,10 @@ print('-'*15 + 'file loaded' + '-'*15)
 translate = {
     "10_blue_train":"火车发票",
     "11_red_train":"火车发票",
-    "12_normal_vat":"",
+    "12_normal_vat":'',
     "13_airport":"飞机行程单",
     "14_quota_receipt":"",
-    "16_machine":"",
+    "16_machine":'',
     "17_taxi":"出租车发票",
     "18_bus":"公路客运发票",
     "19_toll_fee_sh":"车辆通行费",
@@ -73,6 +71,8 @@ for image in recognize.keys():
 report['total'] = count
 report['img'] = img
 print('-'*15 + 'finish transferring' + '-'*15)
+
 #以下另存為json檔，以上為dict
-with open(path + 'report.json','w', encoding='utf8') as report_file:
+with open(path + 'report.json','w', encoding='utf-8') as report_file:
     split_info_json = json.dump(report,report_file,indent=4,ensure_ascii=False)
+print('you can find report.json in ' + path)

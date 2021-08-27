@@ -1,0 +1,13 @@
+.invoiceChar：特徵辨識權重檔案（weights中的best.pt），以及訓練報告
+
+.invoiceDetect：本體辨識權重檔案（weights中的best.pt），以及訓練報告
+
+detect-modify-v2.py：啟動票據本體辨識＋裁切的主程式
+
+split_json.py：生成符合公司需求的Json檔
+
+train_model.ipynb：訓練模型的主程式，目前是只有在colab上跑過，本機端尚未測試過
+
+find_certified_doc：過濾證明文件
+
+LabelToolKit.ipynb：調整訓練用Label的輔助工具

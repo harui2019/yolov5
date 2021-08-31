@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 import cv2
 from pathlib import Path
 import argparse
+import flask
+from flask import jsonify
 
 print("\nModules import completed...")
 print(" - Current Directory ------------ \n>>> {}".format(os.getcwd()))
@@ -433,7 +435,13 @@ def main(opt):
     print("#"*20)
     print("# All Steps Processing End ...")
     print("#"*20+"\n") 
-    
+
+    #########################
+    # call flask api
+    universal_cmd('python api-export.py --path1 {}'.format(save_dir/Path('report.json')))
+
+
 if __name__ == '__main__':
     opt = parse_opt()
     main(opt)
+
